@@ -75,9 +75,26 @@ st.divider()
 # --------------------------------------------------
 
 if not MODEL_PATH.exists():
+    st.info(
+        "First launch: the trained model is missing, so the app "
+        "will download the training dataset and create the model. "
+        "This can take a few minutes."
+    )
+    try:
+        import runpy
+        with st.spinner("Preparing the crop prediction model..."):
+            runpy.run_path(
+                str(Path(__file__).with_name("train_model.py")),
+                run_name="__main__"
+            )
+    except Exception as error:
+        st.error(f"Unable to prepare the model: {error}")
+        st.stop()
+
+if not MODEL_PATH.exists():
     st.error(
-        "Trained model not found. Run "
-        "'python train_model.py' first."
+        "Model generation did not create crop_model.pkl. "
+        "Check the app logs and dataset availability."
     )
     st.stop()
 
